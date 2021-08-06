@@ -1,0 +1,22 @@
+{
+  "name": "pokedex2.js",
+  "version": "1.0.0",
+  "description": "A node.js port of the Pokedex2 C# library.",
+  "main": "build/pokedex2.js",
+  "scripts": {
+    "test": "node build/pokedex2.js"
+  },
+  "author": "Anky Yawanis",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^16.4.12",
+    "tslint": "^6.1.3",
+    "typescript": "^4.3.5"
+  },
+  "dependencies": {
+    "axios": "^0.21.1"
+  },
+  "files": [
+    "build"
+  ]
+}
