@@ -18,5 +18,9 @@
   },
   "files": [
     "build"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ratquaza/pokedex2.js.git"
+  }
 }
