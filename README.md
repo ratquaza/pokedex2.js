@@ -22,5 +22,5 @@ npm install pokedex2.js
 ```
 OR
 ```
-git clone https://github.com/ratquaza/pokedex2.js.git && cd pokedex2.js && tsx
+git clone https://github.com/ratquaza/pokedex2.js.git && cd pokedex2.js && npm install && tsc
 ```
