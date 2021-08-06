@@ -6,10 +6,11 @@ class Pokemon {
     private static readonly SPRITE_URL: string = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/";
 
     readonly name: string;
-    private readonly internalName: string;
     readonly id: number;
-    private readonly apiID: number;
     readonly generation: number;
+
+    private readonly internalName: string;
+    private readonly apiID: number;
 
     readonly isDefault: boolean;
     readonly isBaby: boolean;
