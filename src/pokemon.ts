@@ -15,7 +15,7 @@ class Pokemon {
     readonly isBaby: boolean;
     readonly arctype: Arctype;
 
-    readonly types: Type[];
+    private readonly types: Type[];
     private readonly maleSprites: string[];
     private readonly femaleSprites: string[];
 
@@ -101,6 +101,10 @@ class Pokemon {
 
     public getEvolutions = ():string[] => {
         return this.evolutions;
+    }
+
+    public getTyping = ():Type[] => {
+        return this.types[0] == this.types[1] ? [this.types[0]] : this.types;
     }
 
     public static async loadPokemon(species: any, pokemon: any):Promise<Pokemon> {
