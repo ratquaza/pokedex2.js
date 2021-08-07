@@ -8,11 +8,13 @@ Currently, the Pokedex only holds minimal data on each Pokemon.
 const dex = require('pokedex2.js');
 
 dex("Rayquaza").then((pokemon) => {
-    // If this is the first request for Rayquaza, pokedex2.js will make a GET request and process the data.
+    // If this is the first request for Rayquaza, 
+    // pokedex2.js will make a GET request and process the data.
 }); 
 
 dex("Rayquaza").then((pokemon) => {
-    // Rayquaza's data exists in the registry by now, so no GET request will be made.
+    // Rayquaza's data exists in the registry by now, so no GET 
+    // request will be made.
 }); 
 ```
 
