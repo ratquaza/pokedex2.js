@@ -4,12 +4,14 @@ import axios, { AxiosResponse } from 'axios';
 
 class Pokemon {
     private static readonly SPRITE_URL: string = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/";
+    private static readonly BOX_URL: string = "https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/";
 
     readonly name: string;
     readonly id: number;
     readonly generation: number;
 
-    private readonly internalName: string;
+    private readonly internalPokemonName: string;
+    private readonly internalSpeciesName: string;
     private readonly apiID: number;
 
     readonly isDefault: boolean;
@@ -19,6 +21,7 @@ class Pokemon {
     private readonly types: Type[];
     private readonly maleSprites: string[];
     private readonly femaleSprites: string[];
+    private readonly boxSprites: string[];
 
     private readonly forms: {[key: string]: Pokemon} = {};
 
@@ -34,7 +37,8 @@ class Pokemon {
         })
 
         this.name = targetName;
-        this.internalName = pokemon["name"];
+        this.internalPokemonName = pokemon["name"];
+        this.internalSpeciesName = species["name"];
 
         let generationString: string = species["generation"]["url"];
         this.generation = Number.parseInt(generationString.substring(generationString.length - 2, generationString.length - 1));
@@ -81,12 +85,20 @@ class Pokemon {
                 Pokemon.SPRITE_URL + "back/shiny/female/" + this.apiID + ".png"
             );
         }
+        this.boxSprites = new Array<string>(
+            `${Pokemon.BOX_URL}regular/${this.isDefault ? this.internalSpeciesName : this.internalPokemonName}.png"`,
+            `${Pokemon.BOX_URL}shiny/${this.isDefault ? this.internalSpeciesName : this.internalPokemonName}.png"`
+        );
     }
 
-    public getSprite = (front: boolean = true, female: boolean = false, shiny: boolean = false) => {
+    public getSprite = (front: boolean = true, female: boolean = false, shiny: boolean = false):string => {
         let index: number = (front ? 0 : 2) + (shiny ? 1 : 0);
         return female ? this.femaleSprites[index] : this.maleSprites[index];
     };
+
+    public getBoxSprite = (shiny: boolean = false):string => {
+        return this.boxSprites[shiny ? 1 : 0];
+    }
 
     public toString = ():string => {
         return "Pokemon{" + this.name + "," + this.types[0] + (this.types[1] == this.types[0] ? "" : " " + this.types[1]) + "}";
@@ -126,7 +138,7 @@ class Pokemon {
                 await Promise.all(tasks).then((responses) => {
                     responses.forEach((r) => {
                         let formData: any = r.data;
-                        let formName: string = formData["name"].substring(p.internalName.length + 1);
+                        let formName: string = formData["name"].substring(p.internalSpeciesName.length + 1);
 
                         let form: Pokemon = new Pokemon(species, formData);
                         p.forms[formName] = form;
@@ -134,7 +146,7 @@ class Pokemon {
                 });
             }
 
-            let evolutionData: any = Pokemon.getEvolutionData((await axios.get(species["evolution_chain"]["url"])).data["chain"], p.internalName);
+            let evolutionData: any = Pokemon.getEvolutionData((await axios.get(species["evolution_chain"]["url"])).data["chain"], p.internalSpeciesName);
             let evolutions = evolutionData["evolves_to"];
 
             if (evolutions.length > 0)
