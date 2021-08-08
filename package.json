@@ -4,7 +4,7 @@
   "description": "A node.js port of the Pokedex2 C# library.",
   "main": "build/pokedex2.js",
   "scripts": {
-    "test": "node build/pokedex2.js"
+    "p": "rm -rf build/* && tsc && npm publish"
   },
   "author": "Anky Yawanis",
   "license": "MIT",
