@@ -86,8 +86,8 @@ class Pokemon {
             );
         }
         this.boxSprites = new Array<string>(
-            `${Pokemon.BOX_URL}regular/${this.isDefault ? this.internalSpeciesName : this.internalPokemonName}.png"`,
-            `${Pokemon.BOX_URL}shiny/${this.isDefault ? this.internalSpeciesName : this.internalPokemonName}.png"`
+            `${Pokemon.BOX_URL}regular/${this.isDefault ? this.internalSpeciesName : this.internalPokemonName}.png`,
+            `${Pokemon.BOX_URL}shiny/${this.isDefault ? this.internalSpeciesName : this.internalPokemonName}.png`
         );
     }
 
