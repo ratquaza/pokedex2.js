@@ -4,8 +4,8 @@ import Pokemon from './pokemon';
 
 const registry: {[key: string]: Pokemon} = {};
 
-module.exports = async (poke: string):Promise<Pokemon> => {
-    poke = poke.toLowerCase().replace("\ ", "-").replace(/[^a-zA-Z0-9 -]/, "");
+module.exports = async (poke: string|number):Promise<Pokemon> => {
+    if (typeof(poke) === "string") poke = poke.toLowerCase().replace("\ ", "-").replace(/[^a-zA-Z0-9 -]/, "");
     if (registry[poke] == undefined) {
         try {
             let speciesData = (await axios.get("https://pokeapi.co/api/v2/pokemon-species/" + poke)).data;
