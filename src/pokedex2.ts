@@ -13,7 +13,8 @@ module.exports = async (poke: string|number):Promise<Pokemon> => {
 
             let pokemon: Pokemon = await Pokemon.loadPokemon(speciesData, pokemonData);
 
-            registry[poke] = pokemon;
+            registry[pokemon._internalSpeciesName] = pokemon;
+            registry[pokemon.id] = pokemon;
             return pokemon;
         } catch (e) {
             throw new SyntaxError("Pokemon " + poke + " was not found!");

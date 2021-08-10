@@ -10,9 +10,9 @@ class Pokemon {
     readonly id: number;
     readonly generation: number;
 
-    private readonly internalPokemonName: string;
-    private readonly internalSpeciesName: string;
-    private readonly apiID: number;
+    readonly _internalPokemonName: string;
+    readonly _internalSpeciesName: string;
+    readonly _apiID: number;
 
     readonly isDefault: boolean;
     readonly isBaby: boolean;
@@ -37,13 +37,13 @@ class Pokemon {
         })
 
         this.name = targetName;
-        this.internalPokemonName = pokemon["name"];
-        this.internalSpeciesName = species["name"];
+        this._internalPokemonName = pokemon["name"];
+        this._internalSpeciesName = species["name"];
 
         let generationString: string = species["generation"]["url"];
         this.generation = Number.parseInt(generationString.substring(generationString.length - 2, generationString.length - 1));
         this.id = species["id"];
-        this.apiID = pokemon["id"];
+        this._apiID = pokemon["id"];
 
         this.isDefault = pokemon["is_default"];
         this.isBaby = species["is_baby"];
@@ -68,10 +68,10 @@ class Pokemon {
         }
 
         this.maleSprites = new Array<string>(
-            Pokemon.SPRITE_URL + this.apiID + ".png",
-            Pokemon.SPRITE_URL + "shiny/" + this.apiID + ".png",
-            Pokemon.SPRITE_URL + "back/" + this.apiID + ".png",
-            Pokemon.SPRITE_URL + "back/shiny/" + this.apiID + ".png"
+            Pokemon.SPRITE_URL + this._apiID + ".png",
+            Pokemon.SPRITE_URL + "shiny/" + this._apiID + ".png",
+            Pokemon.SPRITE_URL + "back/" + this._apiID + ".png",
+            Pokemon.SPRITE_URL + "back/shiny/" + this._apiID + ".png"
         )
         if (pokemon["sprites"]["front_female"] === null)
         {
@@ -79,15 +79,15 @@ class Pokemon {
         } else
         {
             this.femaleSprites = new Array<string>(
-                Pokemon.SPRITE_URL + "female/" + this.apiID + ".png",
-                Pokemon.SPRITE_URL + "shiny/female/"  + this.apiID + ".png",
-                Pokemon.SPRITE_URL + "back/female/" + this.apiID + ".png",
-                Pokemon.SPRITE_URL + "back/shiny/female/" + this.apiID + ".png"
+                Pokemon.SPRITE_URL + "female/" + this._apiID + ".png",
+                Pokemon.SPRITE_URL + "shiny/female/"  + this._apiID + ".png",
+                Pokemon.SPRITE_URL + "back/female/" + this._apiID + ".png",
+                Pokemon.SPRITE_URL + "back/shiny/female/" + this._apiID + ".png"
             );
         }
         this.boxSprites = new Array<string>(
-            `${Pokemon.BOX_URL}regular/${this.isDefault ? this.internalSpeciesName : this.internalPokemonName}.png`,
-            `${Pokemon.BOX_URL}shiny/${this.isDefault ? this.internalSpeciesName : this.internalPokemonName}.png`
+            `${Pokemon.BOX_URL}regular/${this.isDefault ? this._internalSpeciesName : this._internalPokemonName}.png`,
+            `${Pokemon.BOX_URL}shiny/${this.isDefault ? this._internalSpeciesName : this._internalPokemonName}.png`
         );
     }
 
@@ -138,7 +138,7 @@ class Pokemon {
                 await Promise.all(tasks).then((responses) => {
                     responses.forEach((r) => {
                         let formData: any = r.data;
-                        let formName: string = formData["name"].substring(p.internalSpeciesName.length + 1);
+                        let formName: string = formData["name"].substring(p._internalSpeciesName.length + 1);
 
                         let form: Pokemon = new Pokemon(species, formData);
                         p.forms[formName] = form;
@@ -146,7 +146,7 @@ class Pokemon {
                 });
             }
 
-            let evolutionData: any = Pokemon.getEvolutionData((await axios.get(species["evolution_chain"]["url"])).data["chain"], p.internalSpeciesName);
+            let evolutionData: any = Pokemon.getEvolutionData((await axios.get(species["evolution_chain"]["url"])).data["chain"], p._internalSpeciesName);
             let evolutions = evolutionData["evolves_to"];
 
             if (evolutions.length > 0)
