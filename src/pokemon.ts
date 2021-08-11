@@ -67,11 +67,13 @@ class Pokemon {
             this.types[1] = typeArray[0]["type"]["name"];;
         }
 
+        let spriteObject = pokemon["sprites"];
+
         this.maleSprites = new Array<string>(
-            Pokemon.SPRITE_URL + this._apiID + ".png",
-            Pokemon.SPRITE_URL + "shiny/" + this._apiID + ".png",
-            Pokemon.SPRITE_URL + "back/" + this._apiID + ".png",
-            Pokemon.SPRITE_URL + "back/shiny/" + this._apiID + ".png"
+            spriteObject["front_default"],
+            spriteObject["front_shiny"],
+            spriteObject["back_default"],
+            spriteObject["back_shiny"]
         )
         if (pokemon["sprites"]["front_female"] === null)
         {
@@ -79,10 +81,10 @@ class Pokemon {
         } else
         {
             this.femaleSprites = new Array<string>(
-                Pokemon.SPRITE_URL + "female/" + this._apiID + ".png",
-                Pokemon.SPRITE_URL + "shiny/female/"  + this._apiID + ".png",
-                Pokemon.SPRITE_URL + "back/female/" + this._apiID + ".png",
-                Pokemon.SPRITE_URL + "back/shiny/female/" + this._apiID + ".png"
+                spriteObject["front_female"],
+                spriteObject["front_shiny_female"],
+                spriteObject["back_female"],
+                spriteObject["back_shiny_female"]
             );
         }
         this.boxSprites = new Array<string>(
