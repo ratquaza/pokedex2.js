@@ -23,9 +23,8 @@ class Pokemon {
     private readonly femaleSprites: string[];
     private readonly boxSprites: string[];
 
-    private readonly forms: {[key: string]: Pokemon} = {};
-
-    private evolutions: string[] = new Array<string>(0);
+    private readonly forms: string[] = [];
+    private evolutions: string[] = [];
 
     private constructor(species: any, pokemon: any) {
         let names: Array<any> = species["names"];
@@ -106,12 +105,8 @@ class Pokemon {
         return "Pokemon{" + this.name + "," + this.types[0] + (this.types[1] == this.types[0] ? "" : " " + this.types[1]) + "}";
     }
 
-    public getForms = ():{name: string, form: Pokemon}[] => {
-        let arr: {name: string, form: Pokemon}[] = new Array<{name: string, form: Pokemon}>();
-        Object.keys(this.forms).map(k => {
-            arr.push({name: k, form: this.forms[k]});
-        })
-        return arr;
+    public getForms = ():string[] => {
+        return this.forms;
     }
 
     public getEvolutions = ():string[] => {
@@ -125,38 +120,21 @@ class Pokemon {
     public static async loadPokemon(species: any, pokemon: any):Promise<Pokemon> {
         let p: Pokemon = new Pokemon(species, pokemon);
 
-        if (p.isDefault) {
-            let varietyArray: Array<any> = species["varieties"];
-            if (varietyArray.length > 1)
-            {
-                let tasks: Array<Promise<AxiosResponse>> = new Array<Promise<AxiosResponse>>();
-
-                for (let i = 1; i < varietyArray.length; i++)
-                {
-                    let promise: Promise<AxiosResponse> = axios.get(varietyArray[i]["pokemon"]["url"]);
-                    tasks.push(promise);
-                }
-
-                await Promise.all(tasks).then((responses) => {
-                    responses.forEach((r) => {
-                        let formData: any = r.data;
-                        let formName: string = formData["name"].substring(p._internalSpeciesName.length + 1);
-
-                        let form: Pokemon = new Pokemon(species, formData);
-                        p.forms[formName] = form;
-                    });
-                });
+        let varietyArray: Array<any> = species["varieties"];
+        varietyArray.forEach((value) => {
+            if (value.pokemon.name !== p._internalPokemonName) {
+                p.forms.push(value.pokemon.name)
             }
+        })
 
-            let evolutionData: any = Pokemon.getEvolutionData((await axios.get(species["evolution_chain"]["url"])).data["chain"], p._internalSpeciesName);
-            let evolutions = evolutionData["evolves_to"];
+        let evolutionData: any = Pokemon.getEvolutionData((await axios.get(species["evolution_chain"]["url"])).data["chain"], p._internalSpeciesName);
+        let evolutions = evolutionData["evolves_to"];
 
-            if (evolutions.length > 0)
+        if (evolutions.length > 0)
+        {
+            for (let i = 0; i < evolutions.length; i++)
             {
-                for (let i = 0; i < evolutions.length; i++)
-                {
-                    p.evolutions.push(evolutions[i]["species"]["name"]);
-                }
+                p.evolutions.push(evolutions[i]["species"]["name"]);
             }
         }
 

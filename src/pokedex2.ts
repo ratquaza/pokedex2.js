@@ -8,12 +8,12 @@ module.exports = async (poke: string|number):Promise<Pokemon> => {
     if (typeof(poke) === "string") poke = poke.toLowerCase().replace("\ ", "-").replace(/[^a-zA-Z0-9 -]/, "");
     if (registry[poke] == undefined) {
         try {
-            let speciesData = (await axios.get("https://pokeapi.co/api/v2/pokemon-species/" + poke)).data;
-            let pokemonData = (await axios.get(speciesData["varieties"][0]["pokemon"]["url"])).data;
+            let pokemonData = (await axios.get("https://pokeapi.co/api/v2/pokemon/" + poke)).data;
+            let speciesData = (await axios.get(pokemonData["species"]["url"])).data;
 
             let pokemon: Pokemon = await Pokemon.loadPokemon(speciesData, pokemonData);
 
-            registry[pokemon._internalSpeciesName] = pokemon;
+            registry[pokemon._internalPokemonName] = pokemon;
             registry[pokemon.id] = pokemon;
             return pokemon;
         } catch (e) {

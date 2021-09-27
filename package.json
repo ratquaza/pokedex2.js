@@ -1,9 +1,10 @@
 {
   "name": "pokedex2.js",
-  "version": "1.2.5",
+  "version": "2.0.0",
   "description": "A node.js port of the Pokedex2 C# library.",
   "main": "build/pokedex2.js",
   "scripts": {
+    "build": "rm -rf build/* && tsc",
     "p": "rm -rf build/* && tsc && npm publish"
   },
   "author": "Anky Yawanis",

@@ -1,7 +1,6 @@
 node_modules/
 .node_modules/
 built/*
-test.js.old
 tests/cases/rwc/*
 tests/cases/test262/*
 tests/cases/perf/*
@@ -100,3 +99,6 @@ tests/cases/user/puppeteer/puppeteer
 tests/cases/user/axios-src/axios-src
 tests/cases/user/prettier/prettier
 .eslintcache
+
+test.js
+test.js.old
