@@ -16,6 +16,12 @@ dex("Rayquaza").then((pokemon) => {
     // Rayquaza's data exists in the registry by now, so no GET 
     // request will be made.
 }); 
+
+dex(savedPokemon).then((pokemon) => {
+    // Loading Pokemon JSONs from file
+    // can be parsed into the dex too,
+    // with all functions and values
+});
 ```
 
 ## Installing
