@@ -32,7 +32,7 @@ const dexFunction = async (poke: string|number|object):Promise<Pokemon> => {
     }
 };
 
-dexFunction.massLoad = async function():Promise<void[]> {
+let massLoad = async function():Promise<void[]> {
     let loadAll =  async function(min:number, max:number):Promise<void> {
         for (let i:number = min; i <= max; i++) {
           await dexFunction(i);
@@ -55,4 +55,5 @@ dexFunction.massLoad = async function():Promise<void[]> {
     return Promise.all(promises);
 }
 
-module.exports = dexFunction;
+export default dexFunction;
+export { massLoad };

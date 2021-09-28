@@ -1,8 +1,8 @@
-import Arctype  from './arctype';
+import Arctype from './arctype';
 import Type from './type';
 import axios from 'axios';
 
-class Pokemon {
+export default class Pokemon {
     private static readonly BOX_URL: string = "https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/";
 
     readonly name: string;
@@ -146,5 +146,3 @@ class Pokemon {
         }
     }
 }
-
-export default Pokemon;
