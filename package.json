@@ -1,6 +1,6 @@
 {
   "name": "pokedex2.js",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "A node.js port of the Pokedex2 C# library.",
   "main": "build/pokedex2.js",
   "scripts": {
@@ -15,8 +15,7 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "axios": "^0.21.1",
-    "stopwatch-node": "^1.1.0"
+    "axios": "^0.21.1"
   },
   "files": [
     "build"
