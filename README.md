@@ -22,6 +22,11 @@ dex(savedPokemon).then((pokemon) => {
     // can be parsed into the dex too,
     // with all functions and values
 });
+
+dex.massLoad().then(() => {
+    // Mass-load every Pokemon (excluding forms) for
+    // efficiency
+});
 ```
 
 ## Installing
