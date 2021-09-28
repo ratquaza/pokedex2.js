@@ -3,7 +3,7 @@ import Pokemon from './pokemon';
 
 const registry: {[key: string]: Pokemon} = {};
 
-module.exports = async (poke: string|number):Promise<Pokemon> => {
+const dexFunction = async (poke: string|number|object):Promise<Pokemon> => {
     if (typeof(poke) === "string" || typeof(poke) === "number") {
         if (typeof(poke) === "string") {
             poke = poke.toLowerCase().replace("\ ", "-").replace(/[^a-zA-Z0-9 -]/, "");
@@ -31,3 +31,28 @@ module.exports = async (poke: string|number):Promise<Pokemon> => {
         return pokemon;
     }
 };
+
+dexFunction.massLoad = async function():Promise<void[]> {
+    let loadAll =  async function(min:number, max:number):Promise<void> {
+        for (let i:number = min; i <= max; i++) {
+          await dexFunction(i);
+        }
+        return;
+    }
+
+    let promises: Promise<void>[] = [
+        loadAll(1, 100),
+        loadAll(101, 200),
+        loadAll(201, 300),
+        loadAll(301, 400),
+        loadAll(401, 500),
+        loadAll(501, 600),
+        loadAll(601, 700),
+        loadAll(701, 800),
+        loadAll(801, 898)
+    ];
+
+    return Promise.all(promises);
+}
+
+module.exports = dexFunction;

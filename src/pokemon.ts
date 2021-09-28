@@ -1,6 +1,6 @@
 import Arctype  from './arctype';
 import Type from './type';
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 
 class Pokemon {
     private static readonly BOX_URL: string = "https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/";
@@ -28,14 +28,13 @@ class Pokemon {
     constructor(species: any = null, pokemon: any = null) {
         if (species && pokemon) {
             let names: Array<any> = species["names"];
-            let targetName: string = "";
-            names.forEach((e) => {
-                if (e["language"]["name"] === "en") {
-                    targetName = e["name"];
+            for (let i = 0; i < names.length; i++) {
+                if (names[i]["language"]["name"] === "en") {
+                    this.name = names[i]["name"];
+                    break;
                 }
-            })
+            }
     
-            this.name = targetName;
             this._internalPokemonName = pokemon["name"];
             this._internalSpeciesName = species["name"];
     
@@ -67,36 +66,23 @@ class Pokemon {
             }
     
             let spriteObject = pokemon["sprites"];
-    
-            this.maleSprites = new Array<string>(
+            this.maleSprites = [
                 spriteObject["front_default"],
                 spriteObject["front_shiny"],
                 spriteObject["back_default"],
                 spriteObject["back_shiny"]
-            )
-            if (pokemon["sprites"]["front_female"] === null)
-            {
-                this.femaleSprites = this.maleSprites;
-            } else
-            {
-                this.femaleSprites = new Array<string>(
-                    spriteObject["front_female"],
-                    spriteObject["front_shiny_female"],
-                    spriteObject["back_female"],
-                    spriteObject["back_shiny_female"]
-                );
-            }
-            this.boxSprites = new Array<string>(
+            ];
+            this.femaleSprites = pokemon["sprites"]["front_female"] || this.maleSprites;
+
+            this.boxSprites = [
                 `${Pokemon.BOX_URL}regular/${this.isDefault ? this._internalSpeciesName : this._internalPokemonName}.png`,
                 `${Pokemon.BOX_URL}shiny/${this.isDefault ? this._internalSpeciesName : this._internalPokemonName}.png`
-            );
+            ];
     
             let varietyArray: Array<any> = species["varieties"];
-            varietyArray.forEach((value) => {
-                if (value.pokemon.name !== this._internalPokemonName) {
-                    this.forms.push(value.pokemon.name)
-                }
-            })
+            for (let i = 0; i < varietyArray.length; i++) {
+                if (varietyArray[i].pokemon.name !== this._internalPokemonName) this.forms.push(varietyArray[i].pokemon.name)
+            }
         }
     }
 
@@ -150,13 +136,10 @@ class Pokemon {
         } else
         {
             let chain: Array<any> = baseChain["evolves_to"];
-            if (chain.length > 0)
-            {
-                for (let i = 0; i < chain.length; i++) {
-                    let data = Pokemon.getEvolutionData(chain[i], internalName);
-                    if (data != null) {
-                        return data;
-                    }
+            for (let i = 0; i < chain.length; i++) {
+                let data = Pokemon.getEvolutionData(chain[i], internalName);
+                if (data != null) {
+                    return data;
                 }
             }
             return null;
