@@ -55,5 +55,9 @@ let massLoad = async function():Promise<void[]> {
     return Promise.all(promises);
 }
 
+let getLoaded = function():{[key: string]: Pokemon} {
+    return { ...registry };
+}
+
 export default dexFunction;
-export { massLoad };
+export { massLoad, getLoaded };

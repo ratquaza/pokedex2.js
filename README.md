@@ -27,6 +27,9 @@ dex.massLoad().then(() => {
     // Mass-load every Pokemon (excluding forms) for
     // efficiency
 });
+
+dex.getLoaded();
+// Returns all currently loaded Pokemon
 ```
 
 ## Installing
