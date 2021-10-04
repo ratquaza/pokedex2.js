@@ -25,14 +25,14 @@ const dexFunction = async (poke: string|number|object):Promise<Pokemon> => {
             return registry[poke];
         }
     } else if (typeof(poke) === "object") {
-        let pokemon: Pokemon = Object.assign(poke, new Pokemon());
+        let pokemon: Pokemon = Object.assign(new Pokemon(), poke);
         registry[pokemon._internalPokemonName] = pokemon;
         registry[pokemon.id] = pokemon;
         return pokemon;
     }
 };
 
-let massLoad = async function():Promise<void[]> {
+dexFunction.massLoad = async function():Promise<void[]> {
     let loadAll =  async function(min:number, max:number):Promise<void> {
         for (let i:number = min; i <= max; i++) {
           await dexFunction(i);
@@ -55,9 +55,8 @@ let massLoad = async function():Promise<void[]> {
     return Promise.all(promises);
 }
 
-let getLoaded = function():{[key: string]: Pokemon} {
+dexFunction.getLoaded = function():{[key: string]: Pokemon} {
     return { ...registry };
 }
 
 export default dexFunction;
-export { massLoad, getLoaded };
