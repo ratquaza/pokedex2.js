@@ -1,6 +1,6 @@
 {
   "name": "pokedex2.js",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "description": "A node.js port of the Pokedex2 C# library.",
   "main": "build/pokedex2.js",
   "scripts": {

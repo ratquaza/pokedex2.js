@@ -73,4 +73,4 @@ dexFunction.getLoaded = function():Collections.Dictionary<string, Pokemon> {
     return registry;
 }
 
-export default dexFunction;
+export = dexFunction;
