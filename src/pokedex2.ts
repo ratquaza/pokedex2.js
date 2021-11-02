@@ -46,31 +46,33 @@ const dexFunction = async (poke: string|number|object):Promise<Pokemon> => {
     }
 };
 
-dexFunction.massLoad = async function():Promise<void[]> {
-    let loadAll =  async function(min:number, max:number):Promise<void> {
-        for (let i:number = min; i <= max; i++) {
-          await dexFunction(i);
+dexFunction.massLoad = async function(bulkSize: number = 200):Promise<void[]> {
+    let pokemon = (await axios.get("https://pokeapi.co/api/v2/pokemon")).data;
+    pokemon = (await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=${pokemon.count}`)).data.results;
+  
+    let promises = [];
+  
+    for (let i = 0; i < Math.ceil(pokemon.length/bulkSize); i++) {
+      promises.push(new Promise<void>(async (res, rej) => {
+        let min = Math.min(pokemon.length - 1, (i + 1) * bulkSize);
+        console.log(`Promise ${i + 1} started`);
+        for (let x = i * 200 + 1; x <= min; x++) {
+          await dexFunction(pokemon[x].name);
         }
-        return;
+        console.log(`Promise ${i + 1} ended`);
+        res();
+      }));
     }
-
-    let promises: Promise<void>[] = [
-        loadAll(1, 100),
-        loadAll(101, 200),
-        loadAll(201, 300),
-        loadAll(301, 400),
-        loadAll(401, 500),
-        loadAll(501, 600),
-        loadAll(601, 700),
-        loadAll(701, 800),
-        loadAll(801, 898)
-    ];
 
     return Promise.all(promises);
 }
 
 dexFunction.getLoaded = function():Collections.Dictionary<string, Pokemon> {
     return registry;
+}
+
+dexFunction.exists = function(poke: string|number):boolean {
+    return typeof(poke) === "number" ? idToName.containsKey(poke) : registry.containsKey(poke);
 }
 
 export = dexFunction;
