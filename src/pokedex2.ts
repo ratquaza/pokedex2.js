@@ -21,32 +21,36 @@ const loadPokemon = async (id: string|number):Promise<Pokemon> => {
     }
 }
 
-const dexFunction = async (poke: string|number|object):Promise<Pokemon> => {
-    if (typeof(poke) === "string" || typeof(poke) === "number") {
-        if (typeof(poke) === "string") {
-            poke = poke.toLowerCase().replace("\ ", "-").replace(/[^a-zA-Z0-9 -]/, "");
-            if (registry.containsKey(poke)) {
-                return registry.getValue(poke);
-            } else {
-                return loadPokemon(poke);
-            }
-        } else if (typeof(poke) === "number") {
-            if (idToName.containsKey(poke)) {
-                poke = idToName.getValue(poke);
-                return registry.getValue(poke);
-            } else {
-                return loadPokemon(poke);
-            }   
+const dexFunction = (poke: string|number|object): Pokemon|Promise<Pokemon> => {
+    if (typeof(poke) === "string") {
+        poke = poke.toLowerCase().replace("\ ", "-").replace(/[^a-zA-Z0-9 -]/, "");
+        if (registry.containsKey(poke)) {
+            return registry.getValue(poke);
+        } else {
+            return loadPokemon(poke);
         }
-    } else if (typeof(poke) === "object") {
+    } 
+    
+    if (typeof(poke) === "number") {
+        if (idToName.containsKey(poke)) {
+            poke = idToName.getValue(poke);
+            return registry.getValue(poke);
+        } else {
+            return loadPokemon(poke);
+        }   
+    }
+    
+    if (typeof(poke) === "object") {
         let pokemon: Pokemon = Object.assign(new Pokemon(), poke);
         registry.setValue(pokemon._internalPokemonName, pokemon);
         idToName.setValue(pokemon.id, pokemon._internalPokemonName);
         return pokemon;
     }
+
+    return undefined;
 };
 
-dexFunction.massLoad = async function(bulkSize: number = 200):Promise<void[]> {
+dexFunction.massLoad = async (bulkSize: number = 200):Promise<void[]> => {
     let pokemon = (await axios.get("https://pokeapi.co/api/v2/pokemon")).data;
     pokemon = (await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=${pokemon.count}`)).data.results;
   
@@ -67,11 +71,11 @@ dexFunction.massLoad = async function(bulkSize: number = 200):Promise<void[]> {
     return Promise.all(promises);
 }
 
-dexFunction.getLoaded = function():Collections.Dictionary<string, Pokemon> {
+dexFunction.getLoaded = ():Collections.Dictionary<string, Pokemon> => {
     return registry;
 }
 
-dexFunction.exists = function(poke: string|number):boolean {
+dexFunction.exists = (poke: string|number):boolean => {
     return typeof(poke) === "number" ? idToName.containsKey(poke) : registry.containsKey(poke);
 }
 
