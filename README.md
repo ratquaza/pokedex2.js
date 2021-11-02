@@ -17,6 +17,10 @@ dex("Rayquaza").then((pokemon) => {
     // request will be made.
 }); 
 
+dex("Rayquaza")
+// Optionally, if you are certain the data has been loaded already
+// you can use this to get the Pokemon directly
+
 dex(savedPokemon).then((pokemon) => {
     // Loading Pokemon JSONs from file
     // can be parsed into the dex too,
