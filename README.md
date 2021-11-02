@@ -30,6 +30,9 @@ dex.massLoad().then(() => {
 
 dex.getLoaded();
 // Returns all currently loaded Pokemon
+
+dex.exists("rayquaza");
+// Check if data has been loaded
 ```
 
 ## Installing
