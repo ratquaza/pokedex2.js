@@ -30,13 +30,12 @@ dex.massLoad().then(() => {
 
 dex.getLoaded();
 // Returns all currently loaded Pokemon
+
+dex.exists("rayquaza");
+// Check if data has been loaded
 ```
 
 ## Installing
 ```
 npm install pokedex2.js
-```
-OR
-```
-git clone https://github.com/ratquaza/pokedex2.js.git && cd pokedex2.js && npm install && tsc
 ```
