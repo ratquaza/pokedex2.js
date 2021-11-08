@@ -73,12 +73,16 @@ export default class Pokemon {
                 this.formtype = FormType.Default;
             }
 
-            if (additionalName.includes("-alola")) {
-                this.regional = Regional.Alolan;
-            } else if (additionalName.includes("-galar")) {
-                this.regional = Regional.Galarian;
-            } else {
+            if (this._internalSpeciesName === "pikachu") {
                 this.regional = Regional.Standard;
+            } else {
+                if (additionalName.includes("-alola")) {
+                    this.regional = Regional.Alolan;
+                } else if (additionalName.includes("-galar")) {
+                    this.regional = Regional.Galarian;
+                } else {
+                    this.regional = Regional.Standard;
+                }
             }
     
             let typeArray: Array<any> = pokemon["types"];

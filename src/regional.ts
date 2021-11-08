@@ -1,7 +1,7 @@
 enum Regional {
   Standard = "standard",
   Alolan = "alolan",
-  Galarian = "galarin"
+  Galarian = "galarian"
 }
 
 export default Regional;
