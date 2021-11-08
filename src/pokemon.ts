@@ -1,6 +1,8 @@
 import Arctype from './arctype';
 import Type from './type';
 import axios from 'axios';
+import FormType from './formtype';
+import Regional from './regional';
 
 export default class Pokemon {
     private static readonly BOX_URL: string = "https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/";
@@ -16,6 +18,8 @@ export default class Pokemon {
     readonly isDefault: boolean;
     readonly isBaby: boolean;
     readonly arctype: Arctype;
+    readonly formtype: FormType;
+    readonly regional: Regional;
 
     private readonly types: Type[];
     private readonly maleSprites: string[];
@@ -54,6 +58,27 @@ export default class Pokemon {
                 this.arctype = Arctype.Ultrabeast;
             } else {
                 this.arctype = Arctype.Normal;
+            }
+
+            let additionalName = this._internalPokemonName.substring(this._internalSpeciesName.length);
+            if (additionalName.includes("-mega")) {
+                this.formtype = FormType.Mega;
+            } else if (additionalName.includes("-gmax")) {
+                this.formtype = FormType.GMax;
+            } else if (additionalName.includes("-primal")) {
+                this.formtype = FormType.Primal;
+            } else if (additionalName.length > 0) {
+                this.formtype = FormType.Other
+            } else {
+                this.formtype = FormType.Default;
+            }
+
+            if (additionalName.includes("-alola")) {
+                this.regional = Regional.Alolan;
+            } else if (additionalName.includes("-galar")) {
+                this.regional = Regional.Galarian;
+            } else {
+                this.regional = Regional.Standard;
             }
     
             let typeArray: Array<any> = pokemon["types"];
