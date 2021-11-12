@@ -61,17 +61,6 @@ export default class Pokemon {
             }
 
             let additionalName = this._internalPokemonName.substring(this._internalSpeciesName.length);
-            if (additionalName.includes("-mega")) {
-                this.formtype = FormType.Mega;
-            } else if (additionalName.includes("-gmax")) {
-                this.formtype = FormType.GMax;
-            } else if (additionalName.includes("-primal")) {
-                this.formtype = FormType.Primal;
-            } else if (additionalName.length > 0) {
-                this.formtype = FormType.Other
-            } else {
-                this.formtype = FormType.Default;
-            }
 
             if (this._internalSpeciesName === "pikachu") {
                 this.regional = Regional.Standard;
@@ -83,6 +72,18 @@ export default class Pokemon {
                 } else {
                     this.regional = Regional.Standard;
                 }
+            }
+
+            if (additionalName.includes("-mega")) {
+                this.formtype = FormType.Mega;
+            } else if (additionalName.includes("-gmax")) {
+                this.formtype = FormType.GMax;
+            } else if (additionalName.includes("-primal")) {
+                this.formtype = FormType.Primal;
+            } else if (additionalName.length > 0 && this.regional == Regional.Standard) {
+                this.formtype = FormType.Other
+            } else {
+                this.formtype = FormType.Default;
             }
     
             let typeArray: Array<any> = pokemon["types"];
