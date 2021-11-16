@@ -7,60 +7,54 @@ import Regional from './regional';
 export default class Pokemon {
     private static readonly BOX_URL: string = "https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/";
 
-    readonly name: string;
-    readonly id: number;
-    readonly generation: number;
+    readonly displayName: string;
+    public readonly ID: number;
+    public readonly generation: number;
 
-    readonly _internalPokemonName: string;
-    readonly _internalSpeciesName: string;
-    readonly _apiID: number;
+    public readonly pokemonName: string;
+    public readonly speciesName: string;
+    public readonly internalID: number;
 
-    readonly isDefault: boolean;
-    readonly isBaby: boolean;
-    readonly arctype: Arctype;
-    readonly formtype: FormType;
-    readonly regional: Regional;
+    public readonly default: boolean;
+    public readonly baby: boolean;
+    public readonly arctype: Arctype;
+    public readonly formtype: FormType;
+    public readonly regional: Regional;
 
-    private readonly types: Type[];
+    public readonly types: Type[];
     private readonly maleSprites: string[];
     private readonly femaleSprites: string[];
     private readonly boxSprites: string[];
 
-    private readonly forms: string[] = [];
-    private evolutions: string[] = [];
+    public readonly forms: string[] = [];
+    public readonly evolutions: string[] = [];
 
     constructor(species: any = null, pokemon: any = null) {
         if (species && pokemon) {
-            let names: Array<any> = species["names"];
-            for (let i = 0; i < names.length; i++) {
-                if (names[i]["language"]["name"] === "en") {
-                    this.name = names[i]["name"];
-                    break;
-                }
-            }
-    
-            this._internalPokemonName = pokemon["name"];
-            this._internalSpeciesName = species["name"];
+            this.displayName = species.names.find((spec: any) => spec.language.name === "en").name;
+
+            this.pokemonName = pokemon["name"];
+            this.speciesName = species["name"];
     
             let generationString: string = species["generation"]["url"];
             this.generation = Number.parseInt(generationString.substring(generationString.length - 2, generationString.length - 1));
-            this.id = species["id"];
-            this._apiID = pokemon["id"];
+            this.ID = species["id"];
+            this.internalID = pokemon["id"];
     
-            this.isDefault = pokemon["is_default"];
-            this.isBaby = species["is_baby"];
+            this.default = pokemon["is_default"];
+            this.baby = species["is_baby"];
     
             if (species["is_legendary"]) {
                 this.arctype = Arctype.Legendary;
             } else if (species["is_mythical"]) {
                 this.arctype = Arctype.Mythical;
-            } else if ((this.id >= 793 && this.id <= 799) || (this.id >= 803 && this.id <= 806)) {
+            } else if ((this.ID >= 793 && this.ID <= 799) || (this.ID >= 803 && this.ID <= 806)) {
                 this.arctype = Arctype.Ultrabeast;
             } else {
                 this.arctype = Arctype.Normal;
             }
 
-            let additionalName = this._internalPokemonName.substring(this._internalSpeciesName.length);
+            let additionalName = this.pokemonName.substring(this.speciesName.length);
             if (additionalName.includes("-mega")) {
                 this.formtype = FormType.Mega;
             } else if (additionalName.includes("-gmax")) {
@@ -73,7 +67,7 @@ export default class Pokemon {
                 this.formtype = FormType.Default;
             }
 
-            if (this._internalSpeciesName === "pikachu") {
+            if (this.speciesName === "pikachu") {
                 this.regional = Regional.Standard;
             } else {
                 if (additionalName.includes("-alola")) {
@@ -104,13 +98,13 @@ export default class Pokemon {
             this.femaleSprites = pokemon["sprites"]["front_female"] || this.maleSprites;
 
             this.boxSprites = [
-                `${Pokemon.BOX_URL}regular/${this.isDefault ? this._internalSpeciesName : this._internalPokemonName}.png`,
-                `${Pokemon.BOX_URL}shiny/${this.isDefault ? this._internalSpeciesName : this._internalPokemonName}.png`
+                `${Pokemon.BOX_URL}regular/${this.default ? this.speciesName : this.pokemonName}.png`,
+                `${Pokemon.BOX_URL}shiny/${this.default ? this.speciesName : this.pokemonName}.png`
             ];
     
             let varietyArray: Array<any> = species["varieties"];
             for (let i = 0; i < varietyArray.length; i++) {
-                if (varietyArray[i].pokemon.name !== this._internalPokemonName) this.forms.push(varietyArray[i].pokemon.name)
+                if (varietyArray[i].pokemon.name !== this.pokemonName) this.forms.push(varietyArray[i].pokemon.name)
             }
         }
     }
@@ -125,7 +119,7 @@ export default class Pokemon {
     }
 
     public toString = ():string => {
-        return "Pokemon{" + this.name + "," + this.types[0] + (this.types[1] == this.types[0] ? "" : " " + this.types[1]) + "}";
+        return "Pokemon{" + this.displayName + ", " + this.types.join(" ") + "}";
     }
 
     public getForms = ():string[] => {
@@ -143,7 +137,7 @@ export default class Pokemon {
     public static async loadPokemon(species: any, pokemon: any):Promise<Pokemon> {
         let p: Pokemon = new Pokemon(species, pokemon);
 
-        let evolutionData: any = Pokemon.getEvolutionData((await axios.get(species["evolution_chain"]["url"])).data["chain"], p._internalSpeciesName);
+        let evolutionData: any = Pokemon.getEvolutionData((await axios.get(species["evolution_chain"]["url"])).data["chain"], p.speciesName);
         let evolutions = evolutionData["evolves_to"];
 
         if (evolutions.length > 0)
