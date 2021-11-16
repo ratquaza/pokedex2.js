@@ -130,7 +130,7 @@ export default class Pokemon {
         return this.evolutions;
     }
 
-    public getTyping = ():Type[] => {
+    public getTypes = ():Type[] => {
         return this.types[0] == this.types[1] ? [this.types[0]] : this.types;
     }
 
