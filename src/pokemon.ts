@@ -118,7 +118,7 @@ export default class Pokemon {
         }
     }
 
-    public getSprite(front: boolean = true, female: boolean = false, shiny: boolean = false):string {
+    public getSprite(front: boolean = true, female: boolean = false, shiny: boolean = false): string | undefined {
         return Pokemon.SPRITE_URL + (!front ? "back/" : "/") + (shiny ? "shiny/" : "/") + (female ? "female/" : "/") + this.apiIndex + ".png"
     };
 }

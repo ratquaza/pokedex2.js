@@ -1,11 +1,11 @@
 import Pokemon from './pokemon.js';
-import fetch from 'node-fetch';
 import { Dictionary } from 'typescript-collections';
 
 const cache: Dictionary<string, Pokemon> = new Dictionary<string, Pokemon>();
 const idToName: Dictionary<number, string> = new Dictionary<number, string>();
 
 const internalLoad = async (id: string|number):Promise<Pokemon> => {
+
     let pokemonData = await (await fetch("https://pokeapi.co/api/v2/pokemon/" + id)).json() as any;
     let speciesData = await (await fetch(pokemonData["species"]["url"])).json() as any;
     let evoData = (await (await fetch(speciesData["evolution_chain"]["url"])).json() as any)["chain"]
