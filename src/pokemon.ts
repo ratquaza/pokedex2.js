@@ -1,171 +1,124 @@
-import Arctype from './arctype';
-import Type from './type';
-import axios from 'axios';
-import FormType from './formtype';
-import Regional from './regional';
+import Arctype from './arctype.js';
+import Type from './type.js';
+import FormType from './formtype.js';
+import Regional from './regional.js';
 
 export default class Pokemon {
-    private static readonly BOX_URL: string = "https://raw.githubusercontent.com/msikma/pokesprite/master/pokemon-gen8/";
+    private static readonly SPRITE_URL: string = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/";
 
-    readonly displayName: string;
-    public readonly ID: number;
+    /** Name of the Pokémon internally */
+    public readonly name: string;
+    /** Display name of the Pokémon */
+    public readonly displayName: string;
+    /** Name of the Pokémon species, e.g. Primal Groudon is of the Groudon species */
+    public readonly species: string;
+
+    /** Generation 1 - 9 */
     public readonly generation: number;
 
-    public readonly pokemonName: string;
-    public readonly speciesName: string;
-    public readonly internalID: number;
+    /** Pokémon's index in the Pokédex */
+    public readonly index: number;
+    /** Pokémon's index in PokéAPI */
+    public readonly apiIndex: number;
 
-    public readonly default: boolean;
+    /** Whether the Pokémon is a baby */
     public readonly baby: boolean;
-    public readonly arctype: Arctype;
-    public readonly formtype: FormType;
-    public readonly regional: Regional;
+    /** The Pokémon's Arctype */
+    public readonly arctype: Arctype = Arctype.Normal;
+    /** The type of the Pokémon's form, i.e. Mega, Gigantamax, etc. */
+    public readonly formtype: FormType = FormType.Default;
+    /** Origin of the Pokémon's form, i.e. Alolan, Galarian */
+    public readonly regional: Regional = Regional.None;
 
+    /** Pokémon's typing */
     public readonly types: Type[];
-    private readonly maleSprites: string[];
-    private readonly femaleSprites: string[];
-    private readonly boxSprites: string[];
-
+    /** Name of the Pokémon's different forms */
     public readonly forms: string[] = [];
+    /** Name of the different species the Pokémon can evolve to */
     public readonly evolutions: string[] = [];
 
-    constructor(species: any = null, pokemon: any = null) {
-        if (species && pokemon) {
-            this.displayName = species.names.find((spec: any) => spec.language.name === "en").name;
+    constructor(species: any = null, pokemon: any = null, evolutionData: any = null) {
+        this.name = pokemon["name"];
+        this.displayName = species.names.find((spec: any) => spec.language.name === "en").name;
+        this.species = species["name"];
+        this.index = species["id"]
+        this.apiIndex = pokemon["id"];
 
-            this.pokemonName = pokemon["name"];
-            this.speciesName = species["name"];
-    
-            let generationString: string = species["generation"]["url"];
-            this.generation = Number.parseInt(generationString.substring(generationString.length - 2, generationString.length - 1));
-            this.ID = species["id"];
-            this.internalID = pokemon["id"];
-    
-            this.default = pokemon["is_default"];
-            this.baby = species["is_baby"];
-    
-            if (species["is_legendary"]) {
-                this.arctype = Arctype.Legendary;
-            } else if (species["is_mythical"]) {
-                this.arctype = Arctype.Mythical;
-            } else if ((this.ID >= 793 && this.ID <= 799) || (this.ID >= 803 && this.ID <= 806)) {
-                this.arctype = Arctype.Ultrabeast;
-            } else {
-                this.arctype = Arctype.Normal;
-            }
+        this.baby = species["is_baby"];
 
-            let additionalName = this.pokemonName.substring(this.speciesName.length);
-            if (this.speciesName === "pikachu") {
-                this.regional = Regional.Standard;
-            } else {
-                if (additionalName.includes("-alola")) {
-                    this.regional = Regional.Alolan;
-                } else if (additionalName.includes("-galar")) {
-                    this.regional = Regional.Galarian;
-                } else {
-                    this.regional = Regional.Standard;
+        // Get the generation by reading the string containing a number
+        // corresponding to the generation - futureproofing the code.
+        // Unless PokeAPI changes the structure of their data
+        let generationString: string = species["generation"]["url"];
+        this.generation = Number.parseInt(generationString.substring(generationString.length - 2, generationString.length - 1));
+
+        // Arctype determined by index, kind of an ugly hacky method
+        if (species["is_legendary"]) {
+            this.arctype = Arctype.Legendary;
+        } else if (species["is_mythical"]) {
+            this.arctype = Arctype.Mythical;
+        } else if (
+            (this.index >= 793 && this.index <= 799) || 
+            (this.index >= 803 && this.index <= 806)) {
+            this.arctype = Arctype.Ultrabeast;
+        } else if (
+            (this.index >= 984 && this.index <= 995) || 
+            (this.index >= 1005 && this.index <= 1010) ||
+            (this.index >= 1020 && this.index <= 1023)) {
+            this.arctype = Arctype.Paradox;
+        }
+
+        // Grabs the internal name, removes the species name and leaves any
+        // trailing characters from its name, often used as descriptors of
+        // the Pokemon
+        // e.g. groudon-primal       -> primal
+        //      darmanitan-galar-zen -> galar-zen
+        let additionalName = this.name.substring(this.species.length + 1);
+        if (additionalName.length > 0) {
+            // Avoiding Pikachu due to cosplay and caps
+            if (this.species !== "pikachu") {
+                for (let v of Object.values(Regional)) {
+                    if (v == Regional.None) continue;
+                    if (additionalName.includes(v)) {
+                        this.regional = v as Regional
+                        break
+                    }
                 }
             }
 
-            if (additionalName.includes("-mega")) {
-                this.formtype = FormType.Mega;
-            } else if (additionalName.includes("-gmax")) {
-                this.formtype = FormType.GMax;
-            } else if (additionalName.includes("-primal")) {
-                this.formtype = FormType.Primal;
-            } else if (additionalName.length > 0 && this.regional == Regional.Standard) {
+            for (let v of Object.values(FormType)) {
+                if (v == FormType.Other || v == FormType.Default) continue;
+                if (additionalName.includes(v)) {
+                    this.formtype = v as FormType
+                    break
+                }
+            }
+
+            if (this.formtype == FormType.Default) {
                 this.formtype = FormType.Other
-            } else {
-                this.formtype = FormType.Default;
             }
-    
-            let typeArray: Array<any> = pokemon["types"];
-            this.types = new Array<Type>(2);
-            this.types[0] = typeArray[0]["type"]["name"];
-            if (typeArray.length > 1) {
-                this.types[1] = typeArray[1]["type"]["name"];
-            } else {
-                this.types[1] = typeArray[0]["type"]["name"];;
-            }
-    
-            let spriteObject = pokemon["sprites"];
-            this.maleSprites = [
-                spriteObject["front_default"],
-                spriteObject["front_shiny"],
-                spriteObject["back_default"],
-                spriteObject["back_shiny"]
-            ];
-            this.femaleSprites = pokemon["sprites"]["front_female"] || this.maleSprites;
+        }
 
-            this.boxSprites = [
-                `${Pokemon.BOX_URL}regular/${this.default ? this.speciesName : this.pokemonName}.png`,
-                `${Pokemon.BOX_URL}shiny/${this.default ? this.speciesName : this.pokemonName}.png`
-            ];
-    
-            let varietyArray: Array<any> = species["varieties"];
-            for (let i = 0; i < varietyArray.length; i++) {
-                if (varietyArray[i].pokemon.name !== this.pokemonName) this.forms.push(varietyArray[i].pokemon.name)
-            }
+        let typeArray: Array<any> = pokemon["types"];
+        this.types = new Array<Type>(2);
+        this.types[0] = typeArray[0]["type"]["name"];
+        if (typeArray.length > 1) {
+            this.types[1] = typeArray[1]["type"]["name"];
+        } else {
+            this.types[1] = this.types[0]
+        }
+
+        let varietyArray: Array<any> = species["varieties"];
+        for (let i = 0; i < varietyArray.length; i++) {
+            if (varietyArray[i].pokemon.name !== this.name) this.forms.push(varietyArray[i].pokemon.name)
+        }
+
+        if (evolutionData["evolves_to"] && evolutionData["evolves_to"].length > 0) {
+            this.evolutions = evolutionData["evolves_to"].map((v: any) => v.species.name)
         }
     }
 
-    public getSprite = (front: boolean = true, female: boolean = false, shiny: boolean = false):string => {
-        let index: number = (front ? 0 : 2) + (shiny ? 1 : 0);
-        return female ? this.femaleSprites[index] : this.maleSprites[index];
+    public getSprite(front: boolean = true, female: boolean = false, shiny: boolean = false):string {
+        return Pokemon.SPRITE_URL + (!front ? "back/" : "/") + (shiny ? "shiny/" : "/") + (female ? "female/" : "/") + this.apiIndex + ".png"
     };
-
-    public getBoxSprite = (shiny: boolean = false):string => {
-        return this.boxSprites[shiny ? 1 : 0];
-    }
-
-    public toString = ():string => {
-        return "Pokemon{" + this.displayName + ", " + this.types.join(" ") + "}";
-    }
-
-    public getForms = ():string[] => {
-        return this.forms;
-    }
-
-    public getEvolutions = ():string[] => {
-        return this.evolutions;
-    }
-
-    public getTypes = ():Type[] => {
-        return this.types[0] == this.types[1] ? [this.types[0]] : this.types;
-    }
-
-    public static async loadPokemon(species: any, pokemon: any):Promise<Pokemon> {
-        let p: Pokemon = new Pokemon(species, pokemon);
-
-        let evolutionData: any = Pokemon.getEvolutionData((await axios.get(species["evolution_chain"]["url"])).data["chain"], p.speciesName);
-        let evolutions = evolutionData["evolves_to"];
-
-        if (evolutions.length > 0)
-        {
-            for (let i = 0; i < evolutions.length; i++)
-            {
-                p.evolutions.push(evolutions[i]["species"]["name"]);
-            }
-        }
-
-        return p;
-    }
-
-    private static getEvolutionData(baseChain: any, internalName: string):any
-    {
-        if (baseChain["species"]["name"] == internalName)
-        {
-            return baseChain;
-        } else
-        {
-            let chain: Array<any> = baseChain["evolves_to"];
-            for (let i = 0; i < chain.length; i++) {
-                let data = Pokemon.getEvolutionData(chain[i], internalName);
-                if (data != null) {
-                    return data;
-                }
-            }
-            return null;
-        }
-    }
 }

@@ -17,6 +17,7 @@ enum Type {
     Rock = "rock", 
     Steel = "steel", 
     Water = "water", 
+    Stellar = "stellar",
     Unknown = "unknown"
 }
 

@@ -1,77 +1,43 @@
-import axios from "axios";
-import Pokemon from './pokemon';
-import * as Collections from 'typescript-collections';
+import Pokemon from './pokemon.js';
+import fetch from 'node-fetch';
+import { Dictionary } from 'typescript-collections';
 
-const registry: Collections.Dictionary<string, Pokemon> = new Collections.Dictionary<string, Pokemon>();
-const idToName: Collections.Dictionary<number, string> = new Collections.Dictionary<number, string>();
+const cache: Dictionary<string, Pokemon> = new Dictionary<string, Pokemon>();
+const idToName: Dictionary<number, string> = new Dictionary<number, string>();
 
-const loadPokemon = async (id: string|number):Promise<Pokemon> => {
-    try {
-        let pokemonData = (await axios.get("https://pokeapi.co/api/v2/pokemon/" + id)).data;
-        let speciesData = (await axios.get(pokemonData["species"]["url"])).data;
+const internalLoad = async (id: string|number):Promise<Pokemon> => {
+    let pokemonData = await (await fetch("https://pokeapi.co/api/v2/pokemon/" + id)).json() as any;
+    let speciesData = await (await fetch(pokemonData["species"]["url"])).json() as any;
+    let evoData = (await (await fetch(speciesData["evolution_chain"]["url"])).json() as any)["chain"]
 
-        let pokemon: Pokemon = await Pokemon.loadPokemon(speciesData, pokemonData);
+    let pokemon: Pokemon = new Pokemon(speciesData, pokemonData, evoData);
+    cache.setValue(pokemon.name, pokemon);
+    idToName.setValue(pokemon.apiIndex, pokemon.name);
 
-        registry.setValue(pokemon.pokemonName, pokemon);
-        idToName.setValue(pokemon.ID, pokemon.pokemonName);
-        return pokemon;
-    } catch (e) {
-        return undefined;
-    }
+    return pokemon;
 }
 
-const dexFunction = async (poke: string|number):Promise<Pokemon> => {
+export function fromJSON(poke: object):Pokemon {
+    let pokemon: Pokemon = Object.assign(new Pokemon(), poke);
+    cache.setValue(pokemon.name, pokemon);
+    idToName.setValue(pokemon.apiIndex, pokemon.name);
+    return pokemon;
+}
+
+export default async (poke: string|number):Promise<Pokemon> => {
     if (typeof(poke) === "number") {
         if (idToName.containsKey(poke)) {
             poke = idToName.getValue(poke);
         } else {
-            return loadPokemon(poke);
+            return internalLoad(poke);
         }   
     } else {
         poke = poke.toLowerCase().replace(" ", "-").replace(/[^a-zA-Z0-9-]/, "");
     }
 
-    if (registry.containsKey(poke)) {
-        return registry.getValue(poke);
+    if (cache.containsKey(poke)) {
+        return cache.getValue(poke);
     } else {
-        return loadPokemon(poke);
+        return internalLoad(poke);
     }
 };
-
-dexFunction.massLoad = async ():Promise<void[]> => {
-    let pokemon = (await axios.get("https://pokeapi.co/api/v2/pokemon")).data;
-    pokemon = (await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=${pokemon.count}`)).data.results;
-  
-    let promises = [];
-  
-    for (let i = 0; i < Math.ceil(pokemon.length/200); i++) {
-      promises.push(new Promise<void>(async (res, rej) => {
-        let min = Math.min(pokemon.length - 1, (i + 1) * 200);
-        console.log(`Promise ${i + 1} started`);
-        for (let x = i * 200 + 1; x <= min; x++) {
-          await dexFunction(pokemon[x].name);
-        }
-        console.log(`Promise ${i + 1} ended`);
-        res();
-      }));
-    }
-
-    return Promise.all(promises);
-}
-
-dexFunction.getLoaded = ():Collections.Dictionary<string, Pokemon> => {
-    return registry;
-}
-
-dexFunction.exists = (poke: string|number):boolean => {
-    return typeof(poke) === "number" ? idToName.containsKey(poke) : registry.containsKey(poke);
-}
-
-dexFunction.fromJSON = (poke: object):Pokemon => {
-    let pokemon: Pokemon = Object.assign(new Pokemon(), poke);
-    registry.setValue(pokemon.pokemonName, pokemon);
-    idToName.setValue(pokemon.ID, pokemon.pokemonName);
-    return pokemon;
-}
-
-export = dexFunction;

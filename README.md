@@ -1,18 +1,11 @@
 # pokedex2.js
-A node.js port of the [Pokedex2 C# library](https://github.com/ratquaza/Pokedex2).
-
-Currently, the Pokedex only holds minimal data on each Pokemon. 
+A TypeScript wrapper for the PokeAPI, based on my [Pokedex2 C# library](https://github.com/ratquaza/Pokedex2).
 
 ## Basic Usage
 ```js
-const dex = require('pokedex2.js');
+import dex from 'pokedex2.js'
 
 dex("rayquaza-mega").then((pokemon) => {
-    console.log(`${pokemon.displayName}`)
+    console.log(pokemon)
 });
-```
-
-## Installing
-```
-npm install pokedex2.js
 ```
