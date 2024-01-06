@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "module": "ES6",
+        "module": "NodeNext",
         "target": "es6",
         "allowJs": true,
         "declaration": true, 
@@ -11,6 +11,6 @@
         "noImplicitAny": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "moduleResolution": "Node"
+        "moduleResolution": "NodeNext"
     }
 }
