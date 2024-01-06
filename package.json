@@ -1,6 +1,6 @@
 {
   "name": "pokedex2.js",
-  "version": "4.0.3",
+  "version": "4.0.6",
   "description": "A TypeScript wrapper for the PokeAPI.",
   "main": "build/pokedex2.js",
   "type": "module",
